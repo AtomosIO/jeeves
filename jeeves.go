@@ -54,14 +54,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Run jeeves
-	output, err := exec.Command("echo", "test").CombinedOutput()
+	// Get task executable and arguments
+	executable := 
+	args := []string{}
+
+	// Run executable with arguments
+	output, err := exec.Command(executable, args).CombinedOutput()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
-	fmt.Println(string(output))
 
 	// Unmount fuse
 	oxygenfuse.Unmount(mountPoint)
@@ -70,7 +72,7 @@ func main() {
 func prepEnv() error {
 	// Get task info
 
-	// Mount at ./atomos/
+	// Mount at /atomos/
 	err := os.Mkdir(mountPoint, 0750)
 	if err != nil {
 		return err
