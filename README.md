@@ -1,4 +1,4 @@
 jeeves
 ======
 
-Jeeves is the agent used to execute Atomos Carbon tasks.
+Jeeves is the agent used to setup the environment for and execute Atomos Carbon tasks.
