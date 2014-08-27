@@ -30,7 +30,7 @@ var (
 func init() {
 	flag.StringVar(&titaniumEndpoint, "titanium", defaultTitaniumEndpoint, "Titanium Endpoint")
 	flag.StringVar(&oxygenEndpoint, "oxygen", defaultOxgenEndpoint, "Oxygen Endpoint")
-	flag.StringVar(&mountPoint, "mount", "./atomos", "Mount Point")
+	flag.StringVar(&mountPoint, "mount", "/atomos", "Mount Point")
 	flag.StringVar(&tokenString, "token", "", "Token")
 }
 
@@ -61,7 +61,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(output)
+	fmt.Println(string(output))
 
 	// Unmount fuse
 	oxygenfuse.Unmount(mountPoint)
