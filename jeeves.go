@@ -4,23 +4,23 @@
 package main
 
 import (
-	//	"errors"
 	"flag"
 	"fmt"
-	//	"github.com/atomosio/common"
-	"github.com/atomosio/oxygen-fuse"
-	//	"github.com/atomosio/oxygen-go"
 	"os"
 	"os/exec"
+
+	"github.com/atomosio/oxygen-fuse"
+	"github.com/atomosio/titanium-go"
 )
 
 const (
 	//	defaultTitaniumEndpoint = common.TitaniumEndpoint
 	//	defaultOxgenEndpoint    = common.OxygenEndpoint
-	//	defaultTitaniumEndpoint = "http://10.240.0.2/"
-	//	defaultOxgenEndpoint    = "http://10.240.0.3/"
-	defaultTitaniumEndpoint = "http://localhost:9002/"
-	defaultOxgenEndpoint    = "http://localhost:9000/"
+	//	defaultTitaniumEndpoint = "http://10.240.0.2"
+	//	defaultOxgenEndpoint    = "http://10.240.0.3"
+	defaultTitaniumEndpoint = "http://localhost:9002"
+	defaultOxgenEndpoint    = "http://localhost:9000"
+	defaultMountPoint       = "/atomos"
 )
 
 var (
@@ -30,7 +30,7 @@ var (
 func init() {
 	flag.StringVar(&titaniumEndpoint, "titanium", defaultTitaniumEndpoint, "Titanium Endpoint")
 	flag.StringVar(&oxygenEndpoint, "oxygen", defaultOxgenEndpoint, "Oxygen Endpoint")
-	flag.StringVar(&mountPoint, "mount", "/atomos", "Mount Point")
+	flag.StringVar(&mountPoint, "mount", defaultMountPoint, "Mount Point")
 	flag.StringVar(&tokenString, "token", "", "Token")
 }
 
@@ -38,6 +38,8 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "Usage:\n")
 	fmt.Fprintf(os.Stderr, "  jeeves -token=<token> [-titanium=<endpoint>] [-oxygen=<endpoint>] [-mount=<path>]\n")
 }
+
+var titaniumClient *titanium.HttpClient
 
 func main() {
 	flag.Parse()
@@ -54,12 +56,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Get task executable and arguments
-	executable := 
-	args := []string{}
+	titaniumClient = titanium.NewHttpClient(titaniumEndpoint, tokenString)
 
-	// Run executable with arguments
-	output, err := exec.Command(executable, args).CombinedOutput()
+	// Get task executable and arguments
+	instance, err := titaniumClient.GetTokenInstance()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	// Create command for execution
+	cmd := exec.Command(instance.Executable, instance.Arguments...)
+
+	// Pass stdout/stderr through
+	cmd.Dir = instance.Directory
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
