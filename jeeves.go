@@ -92,8 +92,9 @@ func prepEnv() error {
 		return err
 	}
 
-	go oxygenfuse.MountAndServeOxygen(mountPoint, oxygenEndpoint, tokenString)
-
+	readyChan := make(chan bool)
+	go oxygenfuse.MountAndServeOxygen(mountPoint, oxygenEndpoint, tokenString, readyChan)
+	<-readyChan
 	// TODO Wait until oxygenfuse has mounted and is ready
 
 	return nil
